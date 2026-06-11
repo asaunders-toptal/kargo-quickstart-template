@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: queue
+  name: backend
   namespace: dev
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: queue
+      app: backend
   template:
     metadata:
       labels:
-        app: queue
+        app: backend
     spec:
       containers:
-      - image: ghcr.io/asaunders-toptal/queue:v0.0.1
-        name: queue
+      - image: ghcr.io/asaunders-toptal/backend:v0.0.1
+        name: backend
         ports:
         - containerPort: 8080
           name: http
@@ -24,7 +24,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: queue
+  name: backend
   namespace: dev
 spec:
   ports:
@@ -32,4 +32,4 @@ spec:
     port: 80
     targetPort: http
   selector:
-    app: queue
+    app: backend
