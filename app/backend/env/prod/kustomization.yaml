@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
 - ../../base
 
-namespace: backend-prod
+namespace: prod
 
 images:
 - name: ghcr.io/asaunders-toptal/backend

@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
 - ../../base
 
-namespace: queue-staging
+namespace: staging
 
 images:
 - name: ghcr.io/asaunders-toptal/queue
