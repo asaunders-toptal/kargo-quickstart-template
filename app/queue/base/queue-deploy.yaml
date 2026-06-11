@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payments
+  name: queue
 spec:
   replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: payments
+      app: queue
   template:
     metadata:
       labels:
-        app: payments
+        app: queue
     spec:
       containers:
-      - image: ghcr.io/asaunders-toptal/payments:latest
-        name: payments
+      - image: ghcr.io/asaunders-toptal/queue:latest
+        name: queue
         ports:
         - name: http
           containerPort: 8080

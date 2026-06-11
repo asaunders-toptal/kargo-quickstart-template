@@ -10,14 +10,27 @@ spec:
       name: guestbook
     sources:
       direct: true
+  - origin:
+      kind: Warehouse
+      name: backend
+    sources:
+      direct: true
+  - origin:
+      kind: Warehouse
+      name: queue
+    sources:
+      direct: true
   promotionTemplate:
     spec:
       vars:
       - name: gitRepo
         value: https://github.com/asaunders-toptal/kargo-quickstart-template
-      - name: imageRepo
+      - name: guestbookImage
         value: ghcr.io/asaunders-toptal/guestbook
-      
+      - name: backendImage
+        value: ghcr.io/asaunders-toptal/backend
+      - name: queueImage
+        value: ghcr.io/asaunders-toptal/queue
       steps:
       - uses: git-clone
         config:
@@ -32,21 +45,43 @@ spec:
         config:
           path: ./out
       - uses: kustomize-set-image
-        as: update-image
+        as: update-image-guestbook
         config:
-          path: ./src/app/env/dev
+          path: ./src/app/guestbook/env/dev
           images:
-          - image: ${{ vars.imageRepo }}
-            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+          - image: ${{ vars.guestbookImage }}
+            tag: ${{ imageFrom(vars.guestbookImage).Tag }}
       - uses: kustomize-build
         config:
-          path: ./src/app/env/dev
-          outPath: ./out/manifests.yaml
+          path: ./src/app/guestbook/env/dev
+          outPath: ./out/guestbook-manifests.yaml
+      - uses: kustomize-set-image
+        as: update-image-backend
+        config:
+          path: ./src/app/backend/env/dev
+          images:
+          - image: ${{ vars.backendImage }}
+            tag: ${{ imageFrom(vars.backendImage).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/backend/env/dev
+          outPath: ./out/backend-manifests.yaml
+      - uses: kustomize-set-image
+        as: update-image-queue
+        config:
+          path: ./src/app/queue/env/dev
+          images:
+          - image: ${{ vars.queueImage }}
+            tag: ${{ imageFrom(vars.queueImage).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/queue/env/dev
+          outPath: ./out/queue-manifests.yaml
       - uses: git-commit
         as: commit
         config:
           path: ./out
-          message: ${{ outputs['update-image'].commitMessage }}
+          message: "Update images for dev"
       - uses: git-push
         config:
           path: ./out
@@ -55,6 +90,14 @@ spec:
         config:
           apps:
           - name: guestbook-simple-dev
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+          - name: backend-dev
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+          - name: queue-dev
             sources:
             - repoURL: ${{ vars.gitRepo }}
               desiredRevision: ${{ outputs.commit.commit }}
@@ -72,13 +115,29 @@ spec:
     sources:
       stages:
       - dev
+  - origin:
+      kind: Warehouse
+      name: backend
+    sources:
+      stages:
+      - dev
+  - origin:
+      kind: Warehouse
+      name: queue
+    sources:
+      stages:
+      - dev
   promotionTemplate:
     spec:
       vars:
       - name: gitRepo
         value: https://github.com/asaunders-toptal/kargo-quickstart-template
-      - name: imageRepo
+      - name: guestbookImage
         value: ghcr.io/asaunders-toptal/guestbook
+      - name: backendImage
+        value: ghcr.io/asaunders-toptal/backend
+      - name: queueImage
+        value: ghcr.io/asaunders-toptal/queue
       steps:
       - uses: git-clone
         config:
@@ -93,21 +152,43 @@ spec:
         config:
           path: ./out
       - uses: kustomize-set-image
-        as: update-image
+        as: update-image-guestbook
         config:
-          path: ./src/app/env/staging
+          path: ./src/app/guestbook/env/staging
           images:
-          - image: ${{ vars.imageRepo }}
-            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+          - image: ${{ vars.guestbookImage }}
+            tag: ${{ imageFrom(vars.guestbookImage).Tag }}
       - uses: kustomize-build
         config:
-          path: ./src/app/env/staging
-          outPath: ./out/manifests.yaml
+          path: ./src/app/guestbook/env/staging
+          outPath: ./out/guestbook-manifests.yaml
+      - uses: kustomize-set-image
+        as: update-image-backend
+        config:
+          path: ./src/app/backend/env/staging
+          images:
+          - image: ${{ vars.backendImage }}
+            tag: ${{ imageFrom(vars.backendImage).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/backend/env/staging
+          outPath: ./out/backend-manifests.yaml
+      - uses: kustomize-set-image
+        as: update-image-queue
+        config:
+          path: ./src/app/queue/env/staging
+          images:
+          - image: ${{ vars.queueImage }}
+            tag: ${{ imageFrom(vars.queueImage).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/queue/env/staging
+          outPath: ./out/queue-manifests.yaml
       - uses: git-commit
         as: commit
         config:
           path: ./out
-          message: ${{ outputs['update-image'].commitMessage }}
+          message: "Promote to staging"
       - uses: git-push
         config:
           path: ./out
@@ -116,6 +197,14 @@ spec:
         config:
           apps:
           - name: guestbook-simple-staging
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+          - name: backend-staging
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+          - name: queue-staging
             sources:
             - repoURL: ${{ vars.gitRepo }}
               desiredRevision: ${{ outputs.commit.commit }}
@@ -133,13 +222,29 @@ spec:
     sources:
       stages:
       - staging
+  - origin:
+      kind: Warehouse
+      name: backend
+    sources:
+      stages:
+      - staging
+  - origin:
+      kind: Warehouse
+      name: queue
+    sources:
+      stages:
+      - staging
   promotionTemplate:
     spec:
       vars:
       - name: gitRepo
         value: https://github.com/asaunders-toptal/kargo-quickstart-template
-      - name: imageRepo
+      - name: guestbookImage
         value: ghcr.io/asaunders-toptal/guestbook
+      - name: backendImage
+        value: ghcr.io/asaunders-toptal/backend
+      - name: queueImage
+        value: ghcr.io/asaunders-toptal/queue
       steps:
       - uses: git-clone
         config:
@@ -154,15 +259,106 @@ spec:
         config:
           path: ./out
       - uses: kustomize-set-image
+        as: update-image-guestbook
+        config:
+          path: ./src/app/guestbook/env/prod
+          images:
+          - image: ${{ vars.guestbookImage }}
+            tag: ${{ imageFrom(vars.guestbookImage).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/guestbook/env/prod
+          outPath: ./out/guestbook-manifests.yaml
+      - uses: kustomize-set-image
+        as: update-image-backend
+        config:
+          path: ./src/app/backend/env/prod
+          images:
+          - image: ${{ vars.backendImage }}
+            tag: ${{ imageFrom(vars.backendImage).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/backend/env/prod
+          outPath: ./out/backend-manifests.yaml
+      - uses: kustomize-set-image
+        as: update-image-queue
+        config:
+          path: ./src/app/queue/env/prod
+          images:
+          - image: ${{ vars.queueImage }}
+            tag: ${{ imageFrom(vars.queueImage).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/queue/env/prod
+          outPath: ./out/queue-manifests.yaml
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./out
+          message: "Promote to prod"
+      - uses: git-push
+        config:
+          path: ./out
+          targetBranch: env/prod
+      - uses: argocd-update
+        config:
+          apps:
+          - name: guestbook-simple-prod
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+          - name: backend-prod
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+          - name: queue-prod
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: backend-dev
+  namespace: kargo-simple
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: backend
+    sources:
+      direct: true
+  promotionTemplate:
+    spec:
+      vars:
+      - name: gitRepo
+        value: https://github.com/asaunders-toptal/kargo-quickstart-template
+      - name: imageRepo
+        value: ghcr.io/asaunders-toptal/backend
+      
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./src
+          - branch: env/backend/dev
+            create: true
+            path: ./out
+      - uses: git-clear
+        config:
+          path: ./out
+      - uses: kustomize-set-image
         as: update-image
         config:
-          path: ./src/app/env/prod
+          path: ./src/app/backend/env/dev
           images:
           - image: ${{ vars.imageRepo }}
             tag: ${{ imageFrom(vars.imageRepo).Tag }}
       - uses: kustomize-build
         config:
-          path: ./src/app/env/prod
+          path: ./src/app/backend/env/dev
           outPath: ./out/manifests.yaml
       - uses: git-commit
         as: commit
@@ -172,11 +368,316 @@ spec:
       - uses: git-push
         config:
           path: ./out
-          targetBranch: env/prod
+          targetBranch: env/backend/dev
       - uses: argocd-update
         config:
           apps:
-          - name: guestbook-simple-prod
+          - name: backend-dev
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: backend-staging
+  namespace: kargo-simple
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: backend
+    sources:
+      stages:
+      - backend-dev
+  promotionTemplate:
+    spec:
+      vars:
+      - name: gitRepo
+        value: https://github.com/asaunders-toptal/kargo-quickstart-template
+      - name: imageRepo
+        value: ghcr.io/asaunders-toptal/backend
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./src
+          - branch: env/backend/staging
+            create: true
+            path: ./out
+      - uses: git-clear
+        config:
+          path: ./out
+      - uses: kustomize-set-image
+        as: update-image
+        config:
+          path: ./src/app/backend/env/staging
+          images:
+          - image: ${{ vars.imageRepo }}
+            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/backend/env/staging
+          outPath: ./out/manifests.yaml
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./out
+          message: ${{ outputs['update-image'].commitMessage }}
+      - uses: git-push
+        config:
+          path: ./out
+          targetBranch: env/backend/staging
+      - uses: argocd-update
+        config:
+          apps:
+          - name: backend-staging
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: backend-prod
+  namespace: kargo-simple
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: backend
+    sources:
+      stages:
+      - backend-staging
+  promotionTemplate:
+    spec:
+      vars:
+      - name: gitRepo
+        value: https://github.com/asaunders-toptal/kargo-quickstart-template
+      - name: imageRepo
+        value: ghcr.io/asaunders-toptal/backend
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./src
+          - branch: env/backend/prod
+            create: true
+            path: ./out
+      - uses: git-clear
+        config:
+          path: ./out
+      - uses: kustomize-set-image
+        as: update-image
+        config:
+          path: ./src/app/backend/env/prod
+          images:
+          - image: ${{ vars.imageRepo }}
+            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/backend/env/prod
+          outPath: ./out/manifests.yaml
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./out
+          message: ${{ outputs['update-image'].commitMessage }}
+      - uses: git-push
+        config:
+          path: ./out
+          targetBranch: env/backend/prod
+      - uses: argocd-update
+        config:
+          apps:
+          - name: backend-prod
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: queue-dev
+  namespace: kargo-simple
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: queue
+    sources:
+      direct: true
+  promotionTemplate:
+    spec:
+      vars:
+      - name: gitRepo
+        value: https://github.com/asaunders-toptal/kargo-quickstart-template
+      - name: imageRepo
+        value: ghcr.io/asaunders-toptal/queue
+      
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./src
+          - branch: env/queue/dev
+            create: true
+            path: ./out
+      - uses: git-clear
+        config:
+          path: ./out
+      - uses: kustomize-set-image
+        as: update-image
+        config:
+          path: ./src/app/queue/env/dev
+          images:
+          - image: ${{ vars.imageRepo }}
+            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/queue/env/dev
+          outPath: ./out/manifests.yaml
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./out
+          message: ${{ outputs['update-image'].commitMessage }}
+      - uses: git-push
+        config:
+          path: ./out
+          targetBranch: env/queue/dev
+      - uses: argocd-update
+        config:
+          apps:
+          - name: queue-dev
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: queue-staging
+  namespace: kargo-simple
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: queue
+    sources:
+      stages:
+      - queue-dev
+  promotionTemplate:
+    spec:
+      vars:
+      - name: gitRepo
+        value: https://github.com/asaunders-toptal/kargo-quickstart-template
+      - name: imageRepo
+        value: ghcr.io/asaunders-toptal/queue
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./src
+          - branch: env/queue/staging
+            create: true
+            path: ./out
+      - uses: git-clear
+        config:
+          path: ./out
+      - uses: kustomize-set-image
+        as: update-image
+        config:
+          path: ./src/app/queue/env/staging
+          images:
+          - image: ${{ vars.imageRepo }}
+            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/queue/env/staging
+          outPath: ./out/manifests.yaml
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./out
+          message: ${{ outputs['update-image'].commitMessage }}
+      - uses: git-push
+        config:
+          path: ./out
+          targetBranch: env/queue/staging
+      - uses: argocd-update
+        config:
+          apps:
+          - name: queue-staging
+            sources:
+            - repoURL: ${{ vars.gitRepo }}
+              desiredRevision: ${{ outputs.commit.commit }}
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: queue-prod
+  namespace: kargo-simple
+spec:
+  requestedFreight:
+  - origin:
+      kind: Warehouse
+      name: queue
+    sources:
+      stages:
+      - queue-staging
+  promotionTemplate:
+    spec:
+      vars:
+      - name: gitRepo
+        value: https://github.com/asaunders-toptal/kargo-quickstart-template
+      - name: imageRepo
+        value: ghcr.io/asaunders-toptal/queue
+      steps:
+      - uses: git-clone
+        config:
+          repoURL: ${{ vars.gitRepo }}
+          checkout:
+          - branch: main
+            path: ./src
+          - branch: env/queue/prod
+            create: true
+            path: ./out
+      - uses: git-clear
+        config:
+          path: ./out
+      - uses: kustomize-set-image
+        as: update-image
+        config:
+          path: ./src/app/queue/env/prod
+          images:
+          - image: ${{ vars.imageRepo }}
+            tag: ${{ imageFrom(vars.imageRepo).Tag }}
+      - uses: kustomize-build
+        config:
+          path: ./src/app/queue/env/prod
+          outPath: ./out/manifests.yaml
+      - uses: git-commit
+        as: commit
+        config:
+          path: ./out
+          message: ${{ outputs['update-image'].commitMessage }}
+      - uses: git-push
+        config:
+          path: ./out
+          targetBranch: env/queue/prod
+      - uses: argocd-update
+        config:
+          apps:
+          - name: queue-prod
             sources:
             - repoURL: ${{ vars.gitRepo }}
               desiredRevision: ${{ outputs.commit.commit }}

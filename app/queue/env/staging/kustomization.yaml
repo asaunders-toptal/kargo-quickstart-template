@@ -4,9 +4,9 @@ kind: Kustomization
 resources:
 - ../../base
 
-namespace: payments-staging
+namespace: queue-staging
 
 images:
-- name: ghcr.io/asaunders-toptal/payments
-  newName: ghcr.io/asaunders-toptal/payments
+- name: ghcr.io/asaunders-toptal/queue
+  newName: ghcr.io/asaunders-toptal/queue
   newTag: v0.0.1

@@ -5,17 +5,11 @@ metadata:
   namespace: argocd
 spec:
   generators:
-    - matrix:
-        generators:
-          - clusters:
-              selector:
-                matchExpressions:
-                - {key: akuity.io/argo-cd-cluster-name, operator: NotIn, values: [in-cluster]}
-          - list:
-              elements:
-              - env: dev
-              - env: staging
-              - env: prod
+    - list:
+        elements:
+        - env: dev
+        - env: staging
+        - env: prod
   template:
     metadata:
       name: 'guestbook-simple-{{env}}'
@@ -28,7 +22,7 @@ spec:
         targetRevision: env/{{env}}
         path: .
       destination:
-        name: '{{name}}'
+        name: in-cluster
         namespace: 'guestbook-simple-{{env}}'
       syncPolicy:
         automated:

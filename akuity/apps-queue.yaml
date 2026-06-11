@@ -1,24 +1,18 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: payments
+  name: queue
   namespace: argocd
 spec:
   generators:
-    - matrix:
-        generators:
-          - clusters:
-              selector:
-                matchExpressions:
-                - {key: akuity.io/argo-cd-cluster-name, operator: NotIn, values: [in-cluster]}
-          - list:
-              elements:
-              - env: dev
-              - env: staging
-              - env: prod
+    - list:
+        elements:
+        - env: dev
+        - env: staging
+        - env: prod
   template:
     metadata:
-      name: 'payments-{{env}}'
+      name: 'queue-{{env}}'
       annotations:
         kargo.akuity.io/authorized-stage: kargo-simple:{{env}}
     spec:
@@ -28,8 +22,8 @@ spec:
         targetRevision: env/{{env}}
         path: .
       destination:
-        name: '{{name}}'
-        namespace: 'payments-{{env}}'
+        name: in-cluster
+        namespace: 'queue-{{env}}'
       syncPolicy:
         automated:
           prune: true

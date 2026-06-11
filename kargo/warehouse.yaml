@@ -8,3 +8,27 @@ spec:
   - image:
       repoURL: ghcr.io/asaunders-toptal/guestbook
       discoveryLimit: 5
+
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: backend
+  namespace: kargo-simple
+spec:
+  subscriptions:
+  - image:
+      repoURL: ghcr.io/asaunders-toptal/backend
+      discoveryLimit: 5
+
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: queue
+  namespace: kargo-simple
+spec:
+  subscriptions:
+  - image:
+      repoURL: ghcr.io/asaunders-toptal/queue
+      discoveryLimit: 5
