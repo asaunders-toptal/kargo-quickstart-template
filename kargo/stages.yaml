@@ -17,6 +17,7 @@ spec:
         value: https://github.com/asaunders-toptal/kargo-quickstart-template
       - name: imageRepo
         value: ghcr.io/asaunders-toptal/guestbook
+      
       steps:
       - uses: git-clone
         config:

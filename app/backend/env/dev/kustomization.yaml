@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+
+namespace: backend-dev
+
+images:
+- name: ghcr.io/asaunders-toptal/backend
+  newName: ghcr.io/asaunders-toptal/backend
+  newTag: v0.0.1
