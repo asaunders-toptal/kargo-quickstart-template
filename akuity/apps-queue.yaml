@@ -1,7 +1,9 @@
+
+---
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: guestbook
+  name: queue
   namespace: argocd
 spec:
   generators:
@@ -12,7 +14,7 @@ spec:
         - env: prod
   template:
     metadata:
-      name: 'guestbook-simple-{{env}}'
+      name: 'queue-{{env}}'
       annotations:
         kargo.akuity.io/authorized-stage: kargo-simple:guestbook-microservices-{{env}}
     spec:
@@ -20,7 +22,7 @@ spec:
       source:
         repoURL: https://github.com/asaunders-toptal/kargo-quickstart-template
         targetRevision: env/{{env}}
-        path: ./app/guestbook/env/{{env}}
+        path:  app/queue/env/{{env}}
       destination:
         name: in-cluster
         namespace: 'guestbook-simple-{{env}}'
