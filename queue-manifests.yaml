@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue
+  namespace: guestbook-simple
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: queue
+  template:
+    metadata:
+      labels:
+        app: queue
+    spec:
+      containers:
+      - image: ghcr.io/asaunders-toptal/queue:v0.0.1
+        name: queue
+        ports:
+        - containerPort: 8080
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: queue
+  namespace: guestbook-simple
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app: queue
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: guestbook-simple
