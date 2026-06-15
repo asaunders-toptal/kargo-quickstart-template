@@ -14,7 +14,7 @@ spec:
     metadata:
       name: 'guestbook-simple-{{env}}'
       annotations:
-        kargo.akuity.io/authorized-stage: kargo-simple:{{env}}
+        kargo.akuity.io/authorized-stage: kargo-simple:guestbook-simple-{{env}}
     spec:
       project: default
       source:
@@ -47,7 +47,7 @@ spec:
     metadata:
       name: 'backend-{{env}}'
       annotations:
-        kargo.akuity.io/authorized-stage: kargo-simple:{{env}}
+        kargo.akuity.io/authorized-stage: kargo-simple:backend-{{env}}
     spec:
       project: default
       source:
@@ -56,7 +56,7 @@ spec:
         path: .
       destination:
         name: in-cluster
-        namespace: 'guestbook-simple-{{env}}'
+        namespace: 'backend-{{env}}'
       syncPolicy:
         automated:
           prune: true
@@ -80,7 +80,7 @@ spec:
     metadata:
       name: 'queue-{{env}}'
       annotations:
-        kargo.akuity.io/authorized-stage: kargo-simple:{{env}}
+        kargo.akuity.io/authorized-stage: kargo-simple:queue-{{env}}
     spec:
       project: default
       source:
@@ -89,7 +89,7 @@ spec:
         path: .
       destination:
         name: in-cluster
-        namespace: 'guestbook-simple-{{env}}'
+        namespace: 'queue-{{env}}'
       syncPolicy:
         automated:
           prune: true

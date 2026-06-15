@@ -14,7 +14,7 @@ spec:
     metadata:
       name: 'backend-{{env}}'
       annotations:
-        kargo.akuity.io/authorized-stage: kargo-simple:{{env}}
+        kargo.akuity.io/authorized-stage: kargo-simple:backend-{{env}}
     spec:
       project: default
       source:
@@ -23,7 +23,7 @@ spec:
         path: .
       destination:
         name: in-cluster
-        namespace: 'backend-{{env}}'
+        namespace: 'guestbook-simple-{{env}}'
       syncPolicy:
         automated:
           prune: true
