@@ -33,3 +33,8 @@ spec:
     targetPort: http
   selector:
     app: queue
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: guestbook-simple
