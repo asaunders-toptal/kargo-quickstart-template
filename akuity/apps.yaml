@@ -20,7 +20,9 @@ spec:
       source:
         repoURL: https://github.com/asaunders-toptal/kargo-quickstart-template
         targetRevision: env/{{env}}
-        path: ./app/guestbook/env/{{env}}
+        path: .
+        directory:
+          include: 'guestbook-manifests.yaml'
       destination:
         name: in-cluster
         namespace: 'guestbook-simple-{{env}}'
@@ -28,5 +30,69 @@ spec:
         automated:
           prune: true
           selfHeal: true
-        syncOptions:
-        - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: backend
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+        - env: dev
+        - env: staging
+        - env: prod
+  template:
+    metadata:
+      name: 'backend-{{env}}'
+      annotations:
+        kargo.akuity.io/authorized-stage: kargo-simple:guestbook-microservices-{{env}}
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/asaunders-toptal/kargo-quickstart-template
+        targetRevision: env/{{env}}
+        path: .
+        directory:
+          include: 'backend-manifests.yaml'
+      destination:
+        name: in-cluster
+        namespace: 'guestbook-simple-{{env}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: queue
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+        - env: dev
+        - env: staging
+        - env: prod
+  template:
+    metadata:
+      name: 'queue-{{env}}'
+      annotations:
+        kargo.akuity.io/authorized-stage: kargo-simple:guestbook-microservices-{{env}}
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/asaunders-toptal/kargo-quickstart-template
+        targetRevision: env/{{env}}
+        path: .
+        directory:
+          include: 'queue-manifests.yaml'
+      destination:
+        name: in-cluster
+        namespace: 'guestbook-simple-{{env}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
