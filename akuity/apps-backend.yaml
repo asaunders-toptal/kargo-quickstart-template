@@ -14,7 +14,7 @@ spec:
     metadata:
       name: 'backend-{{env}}'
       annotations:
-        kargo.akuity.io/authorized-stage: kargo-simple:backend-{{env}}
+        kargo.akuity.io/authorized-stage: kargo-simple:guestbook-microservices-{{env}}
     spec:
       project: default
       source:

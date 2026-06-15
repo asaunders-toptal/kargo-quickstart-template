@@ -6,3 +6,4 @@ namespace: guestbook-simple
 resources:
 - queue-deploy.yaml
 - queue-svc.yaml
+- ns.yaml

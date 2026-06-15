@@ -6,3 +6,4 @@ namespace: guestbook-simple
 resources:
 - backend-deploy.yaml
 - backend-svc.yaml
+- ns.yaml
